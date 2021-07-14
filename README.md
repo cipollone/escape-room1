@@ -1,17 +1,6 @@
-# Python template
+# Escape room1
 
-A template for starting Python 3 projects.
-
-## Use
-
-When you use this repo as template, you have to chage:
-
-- This README
-- The LICENSE
-- Package name and info
-- Add dependencies
-- Personalize editor infos (e.g. python path in .vim/)
-
+A grid-world environment with non-Markovian observations.
 
 ## Install
 This package can be installed as usual:
@@ -24,11 +13,11 @@ Or, we can install a specific tested version of this package and its dependencie
 
 Omit the `--no-dev` option if you're installing for local development.
 
-## Run
-If installed with poetry, you can run the main function with:
+## Use
 
-    poetry run python -m <package-name>
+Import the package use the gym environment:
 
-or specific scripts with:
+    from escape_room1 import EscapeRoom1
+		env = EscapeRoom1()
 
-    poetry run python scripts/<python-file>
+The environment is also registered under the name "EscapeRoom1-v0" for `gym.make`.
