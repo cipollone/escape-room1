@@ -23,8 +23,11 @@ escape_room1_map = """\
 |#     #    |
 |#######    |"""
 escape_room1_map_key: Coords = (1, 1)
-escape_room1_map_door: Coords = (3, 6)
-escape_room1_map_init: Coords = (3, 5)
+escape_room1_map_door: Coords = (6, 3)
+escape_room1_map_init: Coords = (5, 3)
+
+# Global state TODO: very ugly
+has_key = False
 
 
 class DoorDiscreteActions(actions.Command):
@@ -86,34 +89,43 @@ class DoorDiscreteActions(actions.Command):
 
     def step(self, robot: Robot) -> Robot:
         """Move a robot according to the command."""
-        # Update have key
-        if (robot.discrete_x, robot.discrete_y) == escape_room1_map_key:
-            robot._action_info["has_key"] = True  # type: ignore
+        global has_key
 
         # Try to move
         robot2 = self._base_step(robot)
-        robot2._action_info = robot._action_info  # type: ignore
+
+        # Update have key
+        if (robot2.discrete_x, robot2.discrete_y) == escape_room1_map_key:
+            has_key = True
 
         # Do not move without key
         at_door = ((robot2.discrete_x, robot2.discrete_y) == escape_room1_map_door)
-        has_key = robot2._action_info["has_key"]  # type: ignore
         if at_door and not has_key:
             return robot
 
         return robot2
 
 
-class LeaveReward(gym.Wrapper):
-    """Gerates a single reward when the agent leaves the room.
+class EnvCallback(gym.Wrapper):
+    """Various updates on this specific environment.
 
-    Note: assuming the agent is SapientinoDictSpace. 'g' is outside the room.
+    Generates a reward when the agent reaches 'g' on the map.
+    Terminates the episode at the same time.
+    Resets the has_key global information.
     """
+
+    def reset(self):
+        """Gym reset."""
+        global has_key
+        has_key = False
+        return super().reset()
 
     def step(self, action):
         """Generates a reward."""
         obs, reward, done, info = super().step(action)
-        if obs["color"] == color2int[id2color["g"]]:
+        if obs[0]["color"] == color2int[id2color["g"]]:
             reward += 1
+            done = True
         return obs, reward, done, info
 
 
@@ -143,8 +155,8 @@ class EscapeRoom1(gym.Wrapper):
         # Base env
         env = SapientinoDictSpace(configuration=env_conf)
 
-        # Reward
-        env = LeaveReward(env)
+        # Environment dynamics
+        env = EnvCallback(env)
 
         # Features
         env = observations.UseFeatures(

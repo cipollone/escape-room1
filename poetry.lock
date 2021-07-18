@@ -201,8 +201,8 @@ seaborn = "^0.11.0"
 [package.source]
 type = "git"
 url = "https://github.com/whitemech/gym-sapientino.git"
-reference = "91f6530"
-resolved_reference = "91f653074fdd102e3bd5338294a63c0c2b6f9eed"
+reference = "dfe2227"
+resolved_reference = "dfe2227e3a715625a9676f043dc6f4976eaa8b9c"
 
 [[package]]
 name = "importlib-metadata"
@@ -743,7 +743,7 @@ testing = ["pytest (>=4.6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytes
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.7"
-content-hash = "a01cbf238858e074424a692a5bd81aa7a598d62d69dd5660efa7a729b83bd089"
+content-hash = "ae51bc946ac74f7edebd20a9e840878131fa09fd4587939f149ef41e62b68247"
 
 [metadata.files]
 appdirs = [
