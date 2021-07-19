@@ -26,9 +26,6 @@ escape_room1_map_key: Coords = (1, 1)
 escape_room1_map_door: Coords = (6, 3)
 escape_room1_map_init: Coords = (5, 3)
 
-# Global state TODO: very ugly
-has_key = False
-
 
 class DoorDiscreteActions(actions.Command):
     """Discrete actions with modifications .
@@ -87,20 +84,23 @@ class DoorDiscreteActions(actions.Command):
         """Get the "Beep" action."""
         return DoorDiscreteActions.BEEP
 
+    # TODO: has key only works because it is forwarded by the env. Not portable
     def step(self, robot: Robot) -> Robot:
         """Move a robot according to the command."""
-        global has_key
+        if not hasattr(robot, "_has_key"):
+            robot._has_key = False
 
         # Try to move
         robot2 = self._base_step(robot)
+        robot2._has_key = robot._has_key
 
         # Update have key
         if (robot2.discrete_x, robot2.discrete_y) == escape_room1_map_key:
-            has_key = True
+            robot2._has_key = True
 
         # Do not move without key
         at_door = ((robot2.discrete_x, robot2.discrete_y) == escape_room1_map_door)
-        if at_door and not has_key:
+        if at_door and not robot2._has_key:
             return robot
 
         return robot2
@@ -111,14 +111,7 @@ class EnvCallback(gym.Wrapper):
 
     Generates a reward when the agent reaches 'g' on the map.
     Terminates the episode at the same time.
-    Resets the has_key global information.
     """
-
-    def reset(self):
-        """Gym reset."""
-        global has_key
-        has_key = False
-        return super().reset()
 
     def step(self, action):
         """Generates a reward."""
