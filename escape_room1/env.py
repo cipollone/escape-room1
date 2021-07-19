@@ -84,23 +84,20 @@ class DoorDiscreteActions(actions.Command):
         """Get the "Beep" action."""
         return DoorDiscreteActions.BEEP
 
-    # TODO: has key only works because it is forwarded by the env. Not portable
     def step(self, robot: Robot) -> Robot:
         """Move a robot according to the command."""
-        if not hasattr(robot, "_has_key"):
-            robot._has_key = False
+        # NOTE: some callback has to reset key info at each episode
 
         # Try to move
         robot2 = self._base_step(robot)
-        robot2._has_key = robot._has_key
 
         # Update have key
         if (robot2.discrete_x, robot2.discrete_y) == escape_room1_map_key:
-            robot2._has_key = True
+            robot2.robot_config.storage["has_key"] = True
 
         # Do not move without key
         at_door = ((robot2.discrete_x, robot2.discrete_y) == escape_room1_map_door)
-        if at_door and not robot2._has_key:
+        if at_door and not robot2.robot_config.storage["has_key"]:
             return robot
 
         return robot2
@@ -111,7 +108,22 @@ class EnvCallback(gym.Wrapper):
 
     Generates a reward when the agent reaches 'g' on the map.
     Terminates the episode at the same time.
+    Reset key info at the beginning of episode
     """
+
+    def __init__(
+        self,
+        env: gym.Env,
+        agent_config: configurations.SapientinoAgentConfiguration,
+    ):
+        """Initialize."""
+        super().__init__(env)
+        self._agent_config = agent_config
+
+    def reset(self, **kwargs):
+        """Gym reset."""
+        self._agent_config.storage["has_key"] = False
+        return super().reset(**kwargs)
 
     def step(self, action):
         """Generates a reward."""
@@ -149,7 +161,7 @@ class EscapeRoom1(gym.Wrapper):
         env = SapientinoDictSpace(configuration=env_conf)
 
         # Environment dynamics
-        env = EnvCallback(env)
+        env = EnvCallback(env, agent_conf)
 
         # Features
         env = observations.UseFeatures(
