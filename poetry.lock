@@ -201,7 +201,7 @@ seaborn = "^0.11.0"
 [package.source]
 type = "git"
 url = "https://github.com/whitemech/gym-sapientino.git"
-reference = "data-workaround"
+reference = "22eaac1"
 resolved_reference = "22eaac1e701c9895d0af30c9f5dda02bc5beda13"
 
 [[package]]
@@ -743,7 +743,7 @@ testing = ["pytest (>=4.6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytes
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.7"
-content-hash = "9b29e213c7871bc0346a1a7af34e13f983c30b5559efe58f0b62af4033c03639"
+content-hash = "af9c82eef0ae24eda30298eeb9d74338176eebd99f22813e6c7b5cfc76a7525b"
 
 [metadata.files]
 appdirs = [
